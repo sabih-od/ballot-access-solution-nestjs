@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-// import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 
 @Entity()
 export class Users {
@@ -30,7 +30,6 @@ export class Users {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  // @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.model_id, { cascade: true })
-  // @JoinColumn()
-  // modelHasRoles: ModelHasRoles;
+  @OneToMany(() => ModelHasRoles, modelHasRoles => modelHasRoles.users)
+  public modelHasRoles: ModelHasRoles[];
 }

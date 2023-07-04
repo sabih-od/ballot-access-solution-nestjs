@@ -47,7 +47,7 @@ export class AuthService {
 
     const role = await this.rolesRepository.findOne({ where: { name: payload.role } });
     if(!role || payload.role == 'admin') {
-      throw new HttpException('Role not exist', HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException('Invalid role!', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     const users = new Users();
@@ -76,5 +76,27 @@ export class AuthService {
     
     return this.repository.create(payload);
   }
-  
+
+  async getProfile(req) {
+    const user = await this.repository
+                  .createQueryBuilder('users')
+                  .select([
+                    'users.id', 
+                    'users.firstname',
+                    'users.lastname', 
+                    'users.age', 
+                    'users.gender', 
+                    'users.email',
+                  ])
+                  .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
+                    modelType: 'User',
+                  })
+                  .leftJoinAndSelect('modelHasRoles.roles', 'roles')
+                  .where('users.id = :userId', { userId: req.user?.sub })
+                  .getOne();
+
+    return await user;
+
+    // return await req.user;
+  }
 }

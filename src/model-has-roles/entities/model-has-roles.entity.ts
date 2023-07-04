@@ -1,26 +1,26 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
-// import { Users } from 'src/users/entities/users.entity';
-// import { Roles } from 'src/roles/entities/roles.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import { Users } from 'src/users/entities/users.entity';
+import { Roles } from 'src/roles/entities/roles.entity';
 
 @Entity()
 export class ModelHasRoles {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'bigint', unsigned: true })
+  @Column({ type: 'bigint' })
   role_id: number;
 
   @Column({ type: 'varchar', length: 255 })
   model_type: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar' })
   model_id: string;
 
-  // @OneToOne(() => Users, user => user.modelHasRoles)
-  // @JoinColumn()
-  // user: Users;
+  @ManyToOne(() => Users, users => users.modelHasRoles)
+  @JoinColumn({ name: 'model_id' })
+  public users: Users;
 
-  // @OneToOne(() => Roles)
-  // @JoinColumn()
-  // role: Roles;
+  @ManyToOne(() => Roles, roles => roles.modelHasRoles)
+  @JoinColumn({ name: 'role_id' })
+  public roles: Roles;
 }
