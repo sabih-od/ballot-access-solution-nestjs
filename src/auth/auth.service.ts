@@ -26,17 +26,25 @@ export class AuthService {
   ) {}
 
   async signIn(email, pass) {
-    const user = await this.usersService.findOneByEmail(email);
-    const isMatch = await bcrypt.compare(pass, user?.password);
-
-    if (!isMatch) {
-      throw new UnauthorizedException();
+    try {
+      const user = await this.usersService.findOneByEmail(email);
+      if (!user) {
+        throw new HttpException('Invalid credentials!', HttpStatus.UNPROCESSABLE_ENTITY);
+      }
+      
+      const isMatch = await bcrypt.compare(pass, user.password);
+      if (!isMatch) {
+        throw new HttpException('Invalid credentials!', HttpStatus.UNPROCESSABLE_ENTITY);
+      }
+      
+      const payload = { sub: user.id, email: user.email };
+      const access_token = await this.jwtService.signAsync(payload);
+      
+      return { access_token };
+    } catch (error) {
+      console.log('error', error);
+      throw new HttpException('Invalid credentials!', HttpStatus.UNPROCESSABLE_ENTITY);
     }
-    const payload = { sub: user.id, email: user.email };
-
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
   }
 
   async register(payload) {

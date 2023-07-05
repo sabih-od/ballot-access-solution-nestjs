@@ -18,7 +18,11 @@ export class UsersSeeder {
 
         // create product owner user
         let email = 'productowner@yopmail.com';
-        let user = await this.repository.findOne({ where: { email: email} });
+        let user = await this.repository.findOne({ 
+            where: { email: email},
+            relations: ['modelHasRoles'], 
+        });
+        
         if(user == null) {
             const users = new Users();
 
@@ -43,6 +47,16 @@ export class UsersSeeder {
                 model_type: 'User',
                 model_id: user?.id
             });
+        }
+        else {
+            // if product owner does not have admin role so admin role will auto assign
+            if( !(user?.modelHasRoles?.length) ) {
+                this.modelHasRolesRepository.save({
+                    role_id: 1,
+                    model_type: 'User',
+                    model_id: user?.id
+                });
+            }
         }
     }
 };
