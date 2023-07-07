@@ -35,12 +35,12 @@ export class RolesSeeder {
             this.repository.save(roles);
         }
 
-        let findPetitionerGathererRole = await this.repository.findOne({ where: { name: 'petitioner_gatherer' } });
+        let findPetitionerGathererRole = await this.repository.findOne({ where: { name: 'petition_gatherer' } });
         if(findPetitionerGathererRole == null) {
             const roles = new Roles();
 
             roles.id = 3;
-            roles.name = 'petitioner_gatherer';
+            roles.name = 'petition_gatherer';
             roles.guard_name = 'web';
             roles.created_at = new Date();
             roles.updated_at = new Date();

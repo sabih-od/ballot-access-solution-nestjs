@@ -28,6 +28,7 @@ export class AuthService {
   async signIn(email, pass) {
     try {
       const user = await this.usersService.findOneByEmail(email);
+
       if (!user) {
         throw new HttpException('Invalid credentials!', HttpStatus.UNPROCESSABLE_ENTITY);
       }
@@ -40,49 +41,60 @@ export class AuthService {
       const payload = { sub: user.id, email: user.email };
       const access_token = await this.jwtService.signAsync(payload);
       
-      return { access_token };
+      return { access_token, user };
     } catch (error) {
-      console.log('error', error);
-      throw new HttpException('Invalid credentials!', HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }
 
   async register(payload) {
-    const findUser = await this.repository.findOne({ where: { email: payload.email } });
-    if(findUser != null) {
-      throw new HttpException('Email already exist', HttpStatus.UNPROCESSABLE_ENTITY);
+    try {
+      const findUser = await this.repository.findOne({ where: { email: payload.email } });
+      if(findUser != null) {
+        throw new HttpException('Email already exist', HttpStatus.UNPROCESSABLE_ENTITY);
+      }
+
+      const role = await this.rolesRepository.findOne({ where: { name: payload.role } });
+      if(!role || payload.role == 'admin') {
+        throw new HttpException('Invalid role!', HttpStatus.UNPROCESSABLE_ENTITY);
+      }
+
+      const users = new Users();
+
+      const saltOrRounds = 10;
+      const password = payload.password;
+      const hashPassword = await bcrypt.hash(password, saltOrRounds);
+
+      users.id = uuidv4();
+      users.firstname = payload.firstname;
+      users.lastname = payload.lastname;
+      users.age = payload.age;
+      users.gender = payload.gender;
+      users.email = payload.email;
+      users.password = hashPassword;
+      users.created_at = new Date();
+      users.updated_at = new Date();
+
+      let _user = await this.repository.save(users);
+
+      await this.modelHasRolesRepository.save({
+          role_id: role?.id,
+          model_type: 'User',
+          model_id: _user?.id
+      });
+
+      let user = await this.usersService.findOneById(_user?.id);
+      if (!_user) {
+        throw new HttpException('User not found!', HttpStatus.UNPROCESSABLE_ENTITY);
+      }
+
+      const _payload = { sub: user.id, email: user.email };
+      const access_token = await this.jwtService.signAsync(_payload);
+      
+      return { access_token, _user };
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
     }
-
-    const role = await this.rolesRepository.findOne({ where: { name: payload.role } });
-    if(!role || payload.role == 'admin') {
-      throw new HttpException('Invalid role!', HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    const users = new Users();
-
-    const saltOrRounds = 10;
-    const password = payload.password;
-    const hashPassword = await bcrypt.hash(password, saltOrRounds);
-
-    users.id = uuidv4();
-    users.firstname = payload.firstname;
-    users.lastname = payload.lastname;
-    users.age = payload.age;
-    users.gender = payload.gender;
-    users.email = payload.email;
-    users.password = hashPassword;
-    users.created_at = new Date();
-    users.updated_at = new Date();
-
-    let user = await this.repository.save(users);
-
-    this.modelHasRolesRepository.save({
-        role_id: role?.id,
-        model_type: 'User',
-        model_id: user?.id
-    });
-    
-    return this.repository.create(payload);
   }
 
   async getProfile(req) {

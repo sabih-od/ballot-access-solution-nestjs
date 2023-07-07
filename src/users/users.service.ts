@@ -41,7 +41,50 @@ export class UsersService {
 
   async findOneByEmail(email: string) {
     try {
-      return await this.userRepository.findOne({ where: { email: email } });
+      return await this.userRepository
+        .createQueryBuilder('users')
+        .select([
+          'users.id', 
+          'users.firstname',
+          'users.lastname', 
+          'users.age', 
+          'users.gender', 
+          'users.email',
+          'users.password'
+        ])
+        .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
+          modelType: 'User',
+        })
+        .leftJoinAndSelect('modelHasRoles.roles', 'roles')
+        .where('users.email = :email', { email })
+        .getOne();
+
+      // return await this.userRepository.findOne({ where: { email: email }, relations: ['modelHasRoles', 'modelHasRoles.roles'] });
+    } catch (error) {
+      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
+      throw new Error('Error occurred while retrieving user by email');
+    }
+  }
+
+  async findOneById(id: string) {
+    try {
+      return await this.userRepository
+        .createQueryBuilder('users')
+        .select([
+          'users.id', 
+          'users.firstname',
+          'users.lastname', 
+          'users.age', 
+          'users.gender', 
+          'users.email',
+          'users.password'
+        ])
+        .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
+          modelType: 'User',
+        })
+        .leftJoinAndSelect('modelHasRoles.roles', 'roles')
+        .where('users.id = :id', { id })
+        .getOne();
     } catch (error) {
       // Handle the error appropriately (e.g., logging, throwing custom exceptions)
       throw new Error('Error occurred while retrieving user by email');
