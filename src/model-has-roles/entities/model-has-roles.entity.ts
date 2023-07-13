@@ -1,19 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { Users } from 'src/users/entities/users.entity';
 import { Roles } from 'src/roles/entities/roles.entity';
 
 @Entity()
 export class ModelHasRoles {
-  @PrimaryGeneratedColumn()
-  id: number;
+  // @PrimaryGeneratedColumn()
+  // id: number;
 
-  @Column({ type: 'bigint' })
+  @PrimaryColumn({ type: 'bigint' })
+  // @Column({ type: 'bigint' })
   role_id: number;
 
   @Column({ type: 'varchar', length: 255 })
   model_type: string;
 
-  @Column({ type: 'varchar' })
+  @PrimaryColumn({ type: 'varchar' })
+  // @Column({ type: 'varchar' })
   model_id: string;
 
   @ManyToOne(() => Users, users => users.modelHasRoles)

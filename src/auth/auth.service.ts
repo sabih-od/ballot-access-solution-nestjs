@@ -84,14 +84,14 @@ export class AuthService {
       });
 
       let user = await this.usersService.findOneById(_user?.id);
-      if (!_user) {
+      if (!user) {
         throw new HttpException('User not found!', HttpStatus.UNPROCESSABLE_ENTITY);
       }
 
       const _payload = { sub: user.id, email: user.email };
       const access_token = await this.jwtService.signAsync(_payload);
       
-      return { access_token, _user };
+      return { access_token, user };
     } catch (error) {
       throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
     }

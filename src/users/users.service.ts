@@ -32,7 +32,30 @@ export class UsersService {
   }
 
   async findAll(): Promise<Users[]> {
-    return this.userRepository.find();
+    try {
+
+      return this.userRepository.find({
+        select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+            age: true,
+            gender: true,
+            email: true,
+            phone: true,
+            address: true,
+            company: true
+        },
+        relations: {
+          modelHasRoles: {
+            roles: true
+          },
+        },
+      });
+
+    } catch (error) {
+      throw new Error('Error occurred while retrieving user by email');
+    }
   }
 
   async findOne(username: string): Promise<User | undefined> {
@@ -41,6 +64,7 @@ export class UsersService {
 
   async findOneByEmail(email: string) {
     try {
+      
       return await this.userRepository
         .createQueryBuilder('users')
         .select([
@@ -50,7 +74,10 @@ export class UsersService {
           'users.age', 
           'users.gender', 
           'users.email',
-          'users.password'
+          'users.password',
+          'users.phone',
+          'users.address',
+          'users.company'
         ])
         .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
           modelType: 'User',
@@ -77,7 +104,10 @@ export class UsersService {
           'users.age', 
           'users.gender', 
           'users.email',
-          'users.password'
+          'users.password',
+          'users.phone',
+          'users.address',
+          'users.company',
         ])
         .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
           modelType: 'User',

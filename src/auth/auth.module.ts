@@ -20,7 +20,7 @@ import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.enti
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '1200s' },
     }),
     TypeOrmModule.forFeature([Users, Roles, ModelHasRoles])
   ],

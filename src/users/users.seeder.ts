@@ -37,6 +37,7 @@ export class UsersSeeder {
             users.gender = 'male';
             users.email = email;
             users.password = hashPassword;
+            users.phone = '+123 456 7890';
             users.created_at = new Date();
             users.updated_at = new Date();
 
