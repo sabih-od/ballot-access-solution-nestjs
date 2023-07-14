@@ -28,7 +28,9 @@ export class UsersController {
   //   return this.usersService.findOne(username);
   // }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   @Get(':id')
   findOneById(@Param('id') id: string) {
     const user = this.usersService.findOneById(id);
@@ -42,7 +44,7 @@ export class UsersController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')

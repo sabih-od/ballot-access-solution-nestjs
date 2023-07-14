@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -121,13 +121,30 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, payload) {
+    try {
+
+      const user = await this.userRepository.findOneBy({ id });
+
+      if(user != null) {
+        user.firstname = payload.firstname;
+        user.lastname = payload.lastname;
+        user.phone = payload.phone;
+        user.company = payload.company;
+        user.address = payload.address;
+        user.age = payload.age;
+        user.gender = payload.gender;
+        user.updated_at = new Date();
+
+        return await this.userRepository.save(user);
+      }
+    } catch (error) {
+      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
+      throw new Error(error);
+    }
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
-
-  
 }
