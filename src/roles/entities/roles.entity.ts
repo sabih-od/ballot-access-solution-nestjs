@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne } from 'typeorm';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 
 @Entity()
@@ -18,6 +18,6 @@ export class Roles {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  @OneToMany(() => ModelHasRoles, modelHasRoles => modelHasRoles.roles)
+  @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.roles)
   modelHasRoles: ModelHasRoles[];
 }

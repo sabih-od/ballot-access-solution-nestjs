@@ -1,8 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
-import { AuthGuard } from './../auth/auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { Role } from 'src/roles/entities/role.enum';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -13,7 +16,8 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();

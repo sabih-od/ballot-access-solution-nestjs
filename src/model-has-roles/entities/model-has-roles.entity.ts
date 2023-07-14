@@ -18,11 +18,11 @@ export class ModelHasRoles {
   // @Column({ type: 'varchar' })
   model_id: string;
 
-  @ManyToOne(() => Users, users => users.modelHasRoles)
+  @OneToOne(() => Users, users => users.modelHasRoles)
   @JoinColumn({ name: 'model_id' })
   public users: Users;
 
-  @ManyToOne(() => Roles, roles => roles.modelHasRoles)
+  @OneToOne(() => Roles, roles => roles.modelHasRoles)
   @JoinColumn({ name: 'role_id' })
   public roles: Roles;
 }
