@@ -25,9 +25,9 @@ import { join } from 'path';
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions), 
     TypeOrmModule.forFeature([Users, Roles, ModelHasRoles, Petitions]), 
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..'),
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..'),
+    // }),
     RolesModule, 
     UsersModule, 
     AuthModule, 

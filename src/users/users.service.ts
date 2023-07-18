@@ -4,6 +4,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from './entities/users.entity';
+import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
+import { Roles } from 'src/roles/entities/roles.entity';
+import dataSource from 'data-source';
+import { Role } from 'src/roles/entities/role.enum';
 
 export type User = any;
 
@@ -23,8 +27,9 @@ export class UsersService {
   ];
 
   constructor(
-    @InjectRepository(Users)
-    private userRepository: Repository<Users>,
+    @InjectRepository(Users) private repository: Repository<Users>,
+    @InjectRepository(ModelHasRoles) private modelHasRolesRepository: Repository<ModelHasRoles>,
+    @InjectRepository(Roles) private rolesRepository: Repository<Roles>
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -34,7 +39,7 @@ export class UsersService {
   async findAll(): Promise<Users[]> {
     try {
 
-      return this.userRepository.find({
+      return this.repository.find({
         select: {
             id: true,
             firstname: true,
@@ -65,7 +70,7 @@ export class UsersService {
   async findOneByEmail(email: string) {
     try {
       
-      return await this.userRepository
+      return await this.repository
         .createQueryBuilder('users')
         .select([
           'users.id', 
@@ -86,7 +91,7 @@ export class UsersService {
         .where('users.email = :email', { email })
         .getOne();
 
-      // return await this.userRepository.findOne({ where: { email: email }, relations: ['modelHasRoles', 'modelHasRoles.roles'] });
+      // return await this.repository.findOne({ where: { email: email }, relations: ['modelHasRoles', 'modelHasRoles.roles'] });
     } catch (error) {
       // Handle the error appropriately (e.g., logging, throwing custom exceptions)
       throw new Error('Error occurred while retrieving user by email');
@@ -95,7 +100,7 @@ export class UsersService {
 
   async findOneById(id: string) {
     try {
-      return await this.userRepository
+      return await this.repository
         .createQueryBuilder('users')
         .select([
           'users.id', 
@@ -124,7 +129,7 @@ export class UsersService {
   async update(id: string, payload) {
     try {
 
-      const user = await this.userRepository.findOneBy({ id });
+      const user = await this.repository.findOneBy({ id });
 
       if(user != null) {
         user.firstname = payload.firstname;
@@ -136,7 +141,7 @@ export class UsersService {
         user.gender = payload.gender;
         user.updated_at = new Date();
 
-        return await this.userRepository.save(user);
+        return await this.repository.save(user);
       }
     } catch (error) {
       // Handle the error appropriately (e.g., logging, throwing custom exceptions)
@@ -146,5 +151,40 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async allPetitionGatherers() {
+    try {
+      let petition_gatherer = Role.PETITIONER_GATHERER;
+
+      let data = await this.rolesRepository
+                      .createQueryBuilder('roles')
+                      .select([
+                        'roles.name',
+                        'modelHasRoles.role_id',
+                        'modelHasRoles.model_id',
+                        'modelHasRoles.model_type',
+                        'users.id',
+                        'users.firstname',
+                        'users.lastname',
+                        'users.age',
+                        'users.gender',
+                        'users.email',
+                        'users.phone',
+                        'users.address',
+                        'users.company'
+                      ])
+                      .leftJoin('roles.userRoles', 'modelHasRoles')
+                      .leftJoin('modelHasRoles.user', 'users')
+                      .where('roles.name = :petition_gatherer', { petition_gatherer })
+                      .getOne();
+
+      return data?.userRoles ?? [];
+      
+    } catch (error) {
+      
+      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
+      throw new Error(error);
+    }
   }
 }

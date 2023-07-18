@@ -20,4 +20,7 @@ export class Roles {
 
   @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.roles)
   modelHasRoles: ModelHasRoles[];
+
+  @OneToMany(() => ModelHasRoles, modelHasRoles => modelHasRoles.roles)
+  userRoles: ModelHasRoles[];
 }

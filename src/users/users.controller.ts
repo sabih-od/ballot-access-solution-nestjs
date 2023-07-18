@@ -23,10 +23,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  // @Get(':username')
-  // findOne(@Param('username') username: string) {
-  //   return this.usersService.findOne(username);
-  // }
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN, Role.PETITIONER)
+  @Get('/petition-gatherer')
+  allPetitionGatherers() {
+    return this.usersService.allPetitionGatherers();
+  }
 
   // @UseGuards(AuthGuard)
   @UseGuards(RolesGuard)
@@ -36,9 +38,7 @@ export class UsersController {
     const user = this.usersService.findOneById(id);
 
     if(typeof user !== 'object') throw new HttpException('Invalid data!', HttpStatus.UNPROCESSABLE_ENTITY);
-
-    // if(Object.keys(user).length === 0) throw new HttpException('Record not found!', HttpStatus.UNPROCESSABLE_ENTITY);
-
+    
     return user;
   }
 

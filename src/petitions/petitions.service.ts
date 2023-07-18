@@ -18,9 +18,6 @@ export class PetitionsService {
 
   async create(createPetitionDto: CreatePetitionDto, request: Request, file) {
     try {
-      console.log('request', request['files'])
-      console.log('file', file)
-
       const petitions = new Petitions();
 
       petitions.uuid = uuidv4();
@@ -32,14 +29,10 @@ export class PetitionsService {
 
       if((file !== undefined)) {
         // petitions.attachment = file['path'] + '.pdf';
-        petitions.attachment = file['filename'] + '.pdf';
+        petitions.attachment = file['filename'];
       }
 
       let petition = await this.repository.save(petitions);
-
-      console.log('request.user', request.user['sub'])
-      console.log('createPetitionDto', createPetitionDto)
-      console.log('petition', petitions)
 
       return petition;
     } catch (error) {
@@ -47,12 +40,43 @@ export class PetitionsService {
     }
   }
 
-  findAll() {
-    return `This action returns all petitions`;
+  async findAll(): Promise<Petitions[]> {
+    try {
+
+      return this.repository.find({
+        select: {
+          uuid: true,
+          name: true,
+          description: true,
+          attachment: true
+        }
+      });
+
+    } catch (error) {
+      throw new Error('Error occurred while retrieving user by email');
+    }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} petition`;
+  }
+
+  async findOneById(uuid: string) {
+    try {
+      return await this.repository.findOne({ where: { uuid: uuid } })
+    } catch (error) {
+      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
+      throw new Error('Error occurred while retrieving user by email');
+    }
+  }
+
+  async gatherers(uuid: string) {
+    try {
+      return await this.repository.find({ where: { uuid: uuid } })
+    } catch (error) {
+      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
+      throw new Error(error);
+    }
   }
 
   update(id: number, updatePetitionDto: UpdatePetitionDto) {

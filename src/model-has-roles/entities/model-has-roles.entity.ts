@@ -18,11 +18,18 @@ export class ModelHasRoles {
   // @Column({ type: 'varchar' })
   model_id: string;
 
+  // Only get one user
   @OneToOne(() => Users, users => users.modelHasRoles)
   @JoinColumn({ name: 'model_id' })
   public users: Users;
 
+  // Only get one role
   @OneToOne(() => Roles, roles => roles.modelHasRoles)
   @JoinColumn({ name: 'role_id' })
   public roles: Roles;
+
+  // Only get one user
+  @OneToOne(() => Users, users => users.modelHasRoles)
+  @JoinColumn({ name: 'model_id' })
+  public user: Users;
 }

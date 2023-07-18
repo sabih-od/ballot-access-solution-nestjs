@@ -11,6 +11,7 @@ import { Role } from 'src/roles/entities/role.enum';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('petitions')
 export class PetitionsController {
@@ -20,11 +21,18 @@ export class PetitionsController {
   @Roles(Role.ADMIN, Role.PETITIONER)
   @HttpCode(HttpStatus.OK)
   @Post()
-  @UseInterceptors(FileInterceptor('attachment', {
-    storage: diskStorage({
-      destination: 'uploads/petitions/unsigned'
-    })
-  }))
+  @UseInterceptors(
+    FileInterceptor('attachment', {
+      storage: diskStorage({
+        destination: 'uploads',
+        filename: (req, file, callback) => {
+          const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const fileExtension = extname(file.originalname);
+          callback(null, uniqueName + fileExtension);
+        },
+      }),
+    }),
+  )
   create(
     @Body() createPetitionDto: CreatePetitionDto, 
     @Req() request: Request, 
@@ -33,14 +41,20 @@ export class PetitionsController {
     return this.petitionsService.create(createPetitionDto, request, file);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.petitionsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.petitionsService.findOne(+id);
+  @Get(':uuid')
+  findOne(@Param('uuid') uuid: string) {
+    return this.petitionsService.findOneById(uuid);
+  }
+
+  @Get('/gatherers/:uuid')
+  gatherers(@Param('uuid') uuid: string) {
+    return this.petitionsService.gatherers(uuid);
   }
 
   @Patch(':id')
