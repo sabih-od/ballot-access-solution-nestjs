@@ -4,9 +4,6 @@ import { Roles } from 'src/roles/entities/roles.entity';
 
 @Entity()
 export class ModelHasRoles {
-  // @PrimaryGeneratedColumn()
-  // id: number;
-
   @PrimaryColumn({ type: 'bigint' })
   // @Column({ type: 'bigint' })
   role_id: number;
@@ -21,15 +18,15 @@ export class ModelHasRoles {
   // Only get one user
   @OneToOne(() => Users, users => users.modelHasRoles)
   @JoinColumn({ name: 'model_id' })
-  public users: Users;
+  public user: Users;
 
   // Only get one role
   @OneToOne(() => Roles, roles => roles.modelHasRoles)
   @JoinColumn({ name: 'role_id' })
   public roles: Roles;
 
-  // Only get one user
-  @OneToOne(() => Users, users => users.modelHasRoles)
-  @JoinColumn({ name: 'model_id' })
-  public user: Users;
+  // // Only get one user
+  // @OneToOne(() => Users, users => users.modelHasRoles)
+  // @JoinColumn({ name: 'model_id' })
+  // public user: Users;
 }
