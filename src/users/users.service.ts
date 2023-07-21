@@ -28,7 +28,7 @@ export class UsersService {
 
   constructor(
     @InjectRepository(Users) private repository: Repository<Users>,
-    @InjectRepository(ModelHasRoles) private modelHasRolesRepository: Repository<ModelHasRoles>,
+    // @InjectRepository(ModelHasRoles) private modelHasRolesRepository: Repository<ModelHasRoles>,
     @InjectRepository(Roles) private rolesRepository: Repository<Roles>
   ) {}
 

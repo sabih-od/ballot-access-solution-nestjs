@@ -39,6 +39,6 @@ export class Users {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.users)
+  @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.user)
   public modelHasRoles: ModelHasRoles[];
 }

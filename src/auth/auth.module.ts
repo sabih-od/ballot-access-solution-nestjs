@@ -12,6 +12,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/users/entities/users.entity';
 import { Roles } from 'src/roles/entities/roles.entity';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
+import { Permissions } from 'src/permissions/entities/permissions.entity';
+import { RoleHasPermission } from 'src/role-has-permissions/entities/role-has-permission.entity';
+import { ResetCodePasswords } from 'src/reset-code-passwords/entities/reset-code-passwords.entity';
+import { MailService } from 'src/services/mail.service';
 
 @Module({
   imports: [
@@ -22,9 +26,16 @@ import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.enti
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1200s' },
     }),
-    TypeOrmModule.forFeature([Users, Roles, ModelHasRoles])
+    TypeOrmModule.forFeature([
+      Users, 
+      Roles, 
+      ModelHasRoles, 
+      Permissions, 
+      RoleHasPermission,
+      ResetCodePasswords
+    ])
   ],
-  providers: [AuthService, LocalStrategy],
+  providers: [AuthService, LocalStrategy, MailService],
   controllers: [AuthController],
   exports: [AuthService],
 })

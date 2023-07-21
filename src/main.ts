@@ -12,6 +12,6 @@ async function bootstrap() {
   });
   const staticPath = join(process.cwd(), 'uploads');
   app.use(express.static(staticPath));
-  await app.listen(3000);
+  await app.listen(3307);
 }
 bootstrap();

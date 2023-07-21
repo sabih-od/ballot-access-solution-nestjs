@@ -38,10 +38,12 @@ export class UsersController {
     const user = this.usersService.findOneById(id);
 
     if(typeof user !== 'object') throw new HttpException('Invalid data!', HttpStatus.UNPROCESSABLE_ENTITY);
-    
+
     return user;
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);

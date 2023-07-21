@@ -25,7 +25,6 @@ export class UpdateUserDto {
     address: string;
   
     @IsNotEmpty()
-    @IsString()
     age: number;
   
     @IsNotEmpty()
