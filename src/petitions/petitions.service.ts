@@ -8,12 +8,14 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { Petitions } from './entities/petitions.entity';
 import { Request } from 'express';
+// import { runCustomQuery } from 'data-source';
+import { Helper } from './../helper';
 
 @Injectable()
 export class PetitionsService {
   constructor(
     @InjectRepository(Petitions)
-    private repository: Repository<Petitions>,
+    private repository: Repository<Petitions>
   ) {}
 
   async create(createPetitionDto: CreatePetitionDto, request: Request, file) {
@@ -40,22 +42,43 @@ export class PetitionsService {
     }
   }
 
-  async findAll(): Promise<Petitions[]> {
+  async findAll(request: any) {
     try {
+      const role = await Helper.getRoleFromId(request.user['sub']); // Using the helper service to get the role
+      if (role == 'admin') {
+        return this.repository.find({
+          select: {
+            uuid: true,
+            name: true,
+            description: true,
+            attachment: true,
+          },
+        });
+      }
 
-      return this.repository.find({
-        select: {
-          uuid: true,
-          name: true,
-          description: true,
-          attachment: true
-        }
-      });
-
+      if (
+        role == 'site_manager' || 
+        role == 'petition_management_company' || 
+        role == 'ballot_or_initiative_committee' ||
+        role == 'political_candidate'
+      ) {
+        return this.repository.find({
+          select: {
+            uuid: true,
+            name: true,
+            description: true,
+            attachment: true,
+          },
+          where: {
+            user_id: request.user['sub']
+          }
+        });
+      }
     } catch (error) {
-      throw new Error('Error occurred while retrieving user by email');
+      throw new Error('Error occurred while retrieving petitions');
     }
   }
+
 
   findOne(id: number) {
     return `This action returns a #${id} petition`;

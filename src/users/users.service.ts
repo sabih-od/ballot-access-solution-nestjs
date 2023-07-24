@@ -187,4 +187,41 @@ export class UsersService {
       throw new Error(error);
     }
   }
+
+  async allPetitionValidators() {
+    try {
+      let petition_validator = Role.PETITION_VALIDATOR;
+
+      let data = await this.rolesRepository
+                      .createQueryBuilder('roles')
+                      .select([
+                        'roles.name',
+                        'modelHasRoles.role_id',
+                        'modelHasRoles.model_id',
+                        'modelHasRoles.model_type',
+                        'users.id',
+                        'users.firstname',
+                        'users.lastname',
+                        'users.age',
+                        'users.gender',
+                        'users.email',
+                        'users.phone',
+                        'users.address',
+                        'users.company'
+                      ])
+                      .leftJoin('roles.userRoles', 'modelHasRoles')
+                      .leftJoin('modelHasRoles.user', 'users')
+                      .where('roles.name = :petition_validator', { petition_validator })
+                      .getOne();
+
+      return data?.userRoles ?? [];
+      
+    } catch (error) {
+      
+      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
+      throw new Error(error);
+    }
+  }
+
+  
 }

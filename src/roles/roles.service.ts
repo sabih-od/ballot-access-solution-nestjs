@@ -4,12 +4,13 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Roles } from './entities/roles.entity';
+import { Not } from 'typeorm';
 
 @Injectable()
 export class RolesService {
   constructor(
     @InjectRepository(Roles)
-    private roleRepository: Repository<Roles>,
+    private repository: Repository<Roles>,
   ) {}
 
   create(createRoleDto: CreateRoleDto) {
@@ -22,11 +23,25 @@ export class RolesService {
     roles.created_at = created_at;
     roles.updated_at = updated_at;
 
-    return this.roleRepository.save(roles);
+    return this.repository.save(roles);
   }
 
   findAll() {
-    return `This action returns all roles`;
+    try {
+
+      return this.repository.find({
+        select: {
+          name: true,
+          guard_name: true
+        },
+        where: {
+          name: Not('admin')
+        }
+      });
+
+    } catch (error) {
+      throw new Error('Error occurred while retrieving user by email');
+    }
   }
 
   findOne(id: number) {
@@ -43,7 +58,7 @@ export class RolesService {
 
   async findByName(name: string) {
     try {
-      return await this.roleRepository.findOne({ where: { name: name } });
+      return await this.repository.findOne({ where: { name: name } });
     } catch (error) {
       // Handle the error appropriately (e.g., logging, throwing custom exceptions)
       throw new Error('Error occurred while retrieving user by email');
