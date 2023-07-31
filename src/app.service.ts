@@ -21,6 +21,5 @@ export class AppService implements OnApplicationBootstrap {
     this.rolesSeeder.init()
     this.permissionsSeeder.init()
     this.usersSeeder.init()
-
   }
 }

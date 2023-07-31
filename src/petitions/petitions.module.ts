@@ -7,9 +7,10 @@ import { Petitions } from './entities/petitions.entity';
 import { Users } from 'src/users/entities/users.entity';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 import { Roles } from 'src/roles/entities/roles.entity';
+import { Hires } from 'src/hires/entities/hires.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Petitions, Users, ModelHasRoles, Roles])],
+  imports: [TypeOrmModule.forFeature([Petitions, Users, ModelHasRoles, Roles, Hires])],
   controllers: [PetitionsController],
   providers: [PetitionsService, UsersService]
 })

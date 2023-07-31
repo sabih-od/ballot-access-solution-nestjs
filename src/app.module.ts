@@ -17,6 +17,7 @@ import { Petitions } from './petitions/entities/petitions.entity';
 import { Permissions } from './permissions/entities/permissions.entity';
 import { RoleHasPermission } from './role-has-permissions/entities/role-has-permission.entity';
 import { ResetCodePasswords } from './reset-code-passwords/entities/reset-code-passwords.entity';
+import { Hires } from './hires/entities/hires.entity';
 
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
@@ -29,6 +30,7 @@ import { RoleHasPermissionsModule } from './role-has-permissions/role-has-permis
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ResetCodePasswordsModule } from './reset-code-passwords/reset-code-passwords.module';
+import { HiresModule } from './hires/hires.module';
 
 @Module({
   imports: [
@@ -41,7 +43,8 @@ import { ResetCodePasswordsModule } from './reset-code-passwords/reset-code-pass
       Permissions, 
       RoleHasPermission, 
       Petitions,
-      ResetCodePasswords
+      ResetCodePasswords,
+      Hires
     ]),
     MailerModule.forRoot({
       transport: {
@@ -66,7 +69,8 @@ import { ResetCodePasswordsModule } from './reset-code-passwords/reset-code-pass
     PetitionsModule, 
     PermissionsModule,
     RoleHasPermissionsModule,
-    ResetCodePasswordsModule
+    ResetCodePasswordsModule,
+    HiresModule
   ],
   controllers: [AppController],
   providers: [

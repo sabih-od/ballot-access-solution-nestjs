@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne } from 'typeorm';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
+import { Hires } from 'src/hires/entities/hires.entity';
 
 @Entity()
 export class Users {
@@ -41,4 +42,6 @@ export class Users {
 
   @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.user)
   public modelHasRoles: ModelHasRoles[];
+
+  @OneToMany(type => Hires, hire => hire.user) hire: Hires;
 }

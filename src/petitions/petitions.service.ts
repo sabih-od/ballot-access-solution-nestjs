@@ -10,12 +10,17 @@ import { Petitions } from './entities/petitions.entity';
 import { Request } from 'express';
 // import { runCustomQuery } from 'data-source';
 import { Helper } from './../helper';
+import { Hires, StatusEnum } from 'src/hires/entities/hires.entity';
+import { Role } from 'src/roles/entities/role.enum';
 
 @Injectable()
 export class PetitionsService {
   constructor(
     @InjectRepository(Petitions)
-    private repository: Repository<Petitions>
+    private repository: Repository<Petitions>,
+
+    @InjectRepository(Hires)
+    private hireRepository: Repository<Hires>
   ) {}
 
   async create(createPetitionDto: CreatePetitionDto, request: Request, file) {
@@ -44,7 +49,7 @@ export class PetitionsService {
 
   async findAll(request: any) {
     try {
-      const role = await Helper.getRoleFromId(request.user['sub']); // Using the helper service to get the role
+      const role = await Helper.role(request.user['sub']); // Using the helper service to get the role
       if (role == 'admin') {
         return this.repository.find({
           select: {
@@ -74,6 +79,14 @@ export class PetitionsService {
           }
         });
       }
+
+      if (
+        role == 'petition_gatherer' ||
+        role == 'petition_validator'
+      ) {
+        
+      }
+
     } catch (error) {
       throw new Error('Error occurred while retrieving petitions');
     }
@@ -86,7 +99,71 @@ export class PetitionsService {
 
   async findOneById(uuid: string) {
     try {
-      return await this.repository.findOne({ where: { uuid: uuid } })
+      let result = {
+        data: {},
+        petitionGatherer: [],
+        petitionValidator: [],
+      };
+      
+      result.data = await this.repository.findOne({
+        where: { uuid: uuid }
+      });
+
+      if(result.data) {
+        result.petitionGatherer = await this.hireRepository.find({
+          select: {
+            user_id: true,
+            role_name: true,
+            user: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              age: true,
+              gender: true,
+              email: true,
+              phone: true,
+              address: true,
+              company: true
+            }
+          },
+          where: {
+            petition_id: result.data['id'],
+            role_name: Role.PETITIONER_GATHERER,
+            status: StatusEnum.ACCEPT
+          },
+          relations: {
+            user: true
+          }
+        });
+
+        result.petitionValidator = await this.hireRepository.find({
+          select: {
+            user_id: true,
+            role_name: true,
+            user: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              age: true,
+              gender: true,
+              email: true,
+              phone: true,
+              address: true,
+              company: true
+            }
+          },
+          where: {
+            petition_id: result.data['id'],
+            role_name: Role.PETITION_VALIDATOR,
+            status: StatusEnum.ACCEPT
+          },
+          relations: {
+            user: true
+          }
+        });
+      }
+
+      return result;
     } catch (error) {
       // Handle the error appropriately (e.g., logging, throwing custom exceptions)
       throw new Error('Error occurred while retrieving user by email');

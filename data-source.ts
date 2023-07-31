@@ -1,4 +1,4 @@
-import { DataSource, DataSourceOptions, Connection } from "typeorm";
+import { DataSource, DataSourceOptions } from "typeorm";
 
 
 
@@ -22,7 +22,7 @@ const dataSource = new DataSource(dataSourceOptions)
 export default dataSource;
 
 export async function runCustomQuery(query: string, parameters?: any[]): Promise<any> {
-  const connection: Connection = dataSource.manager.connection;
+  const connection: any = dataSource.manager.connection;
 
   try {
     // Check if the connection is established before running the query

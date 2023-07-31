@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import { Hires } from 'src/hires/entities/hires.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 
 @Entity()
 export class Petitions {
@@ -25,4 +26,6 @@ export class Petitions {
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
+
+    // @OneToMany(type => Hires, hire => hire.petition) hire: Hires;
 }

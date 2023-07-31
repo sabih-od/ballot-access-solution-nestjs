@@ -38,7 +38,6 @@ export class UsersService {
 
   async findAll(): Promise<Users[]> {
     try {
-
       return this.repository.find({
         select: {
             id: true,
@@ -57,7 +56,6 @@ export class UsersService {
           },
         },
       });
-
     } catch (error) {
       throw new Error('Error occurred while retrieving user by email');
     }
