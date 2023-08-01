@@ -18,7 +18,7 @@ export class UsersSeeder {
 
         // create product owner user
         let email = 'productowner@yopmail.com';
-        let user = await this.repository.findOne({ 
+        let user = await this.repository.findOne({
             where: { email: email},
             relations: ['modelHasRoles'], 
         });

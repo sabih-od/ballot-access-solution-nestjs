@@ -17,17 +17,38 @@ export class UsersController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(
+    Role.ADMIN
+  )
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.PETITIONER)
+  @Roles(
+    Role.ADMIN,
+    Role.BALLOT_OR_INITIATIVE_COMMITTEE, 
+    Role.PETITION_MANAGEMENT_COMPANY, 
+    Role.POLITICAL_CANDIDATE, 
+    Role.SITE_MANAGER
+  )
   @Get('/petition-gatherer')
   allPetitionGatherers() {
     return this.usersService.allPetitionGatherers();
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(
+    Role.ADMIN,
+    Role.BALLOT_OR_INITIATIVE_COMMITTEE, 
+    Role.PETITION_MANAGEMENT_COMPANY, 
+    Role.POLITICAL_CANDIDATE, 
+    Role.SITE_MANAGER
+  )
+  @Get('/petition-validator')
+  allPetitionValidators() {
+    return this.usersService.allPetitionValidators();
   }
 
   // @UseGuards(AuthGuard)

@@ -49,7 +49,7 @@ export class AuthService {
       
       return { access_token, user };
     } catch (error) {
-      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -99,7 +99,7 @@ export class AuthService {
       
       return { access_token, user };
     } catch (error) {
-      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -159,7 +159,7 @@ export class AuthService {
 
       return { message: 'Email sent successfully!' };
     } catch (error) {
-      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -198,7 +198,7 @@ export class AuthService {
       // return response
       return { message: 'Password has been reset successfully!' };
     } catch (error) {
-      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 }

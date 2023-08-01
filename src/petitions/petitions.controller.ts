@@ -18,7 +18,7 @@ export class PetitionsController {
   constructor(private readonly petitionsService: PetitionsService) {}
 
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.PETITIONER)
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   @Post()
   @UseInterceptors(
@@ -43,13 +43,14 @@ export class PetitionsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.petitionsService.findAll();
+  findAll(@Req() request: Request) {
+    return this.petitionsService.findAll(request);
   }
 
+  @UseGuards(AuthGuard)
   @Get(':uuid')
-  findOne(@Param('uuid') uuid: string) {
-    return this.petitionsService.findOneById(uuid);
+  findOne(@Param('uuid') uuid: string, @Req() request: Request) {
+    return this.petitionsService.findOneById(uuid, request);
   }
 
   @Get('/gatherers/:uuid')
