@@ -19,19 +19,23 @@ export class Hires {
     role_name: string;
 
     @Column({ type: 'varchar', length: 255 })
-    user_id: string;
+    receiver_id: string;
 
     @Column({ type: 'varchar', length: 255 })
     status: StatusEnum;
 
     @Column({ type: 'varchar', length: 255 })
-    request_by: string;
+    sender_id: string;
 
-    @ManyToOne(() => Users, user => user.hire) 
-    @JoinColumn({ name: 'user_id' })
-    user: Users;
+    @ManyToOne(() => Users, sender => sender.hire) 
+    @JoinColumn({ name: 'sender_id' })
+    sender: Users;
 
-    // @ManyToOne(() => Petitions, petition => petition.hire) 
-    // @JoinColumn({ name: 'petition_id' })
-    // petition: Petitions;
+    @ManyToOne(() => Users, receiver => receiver._hire) 
+    @JoinColumn({ name: 'receiver_id' })
+    receiver: Users;
+
+    @ManyToOne(() => Petitions, petition => petition.hire) 
+    @JoinColumn({ name: 'petition_id' })
+    petition: Petitions;
 }

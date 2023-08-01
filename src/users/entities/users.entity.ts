@@ -43,5 +43,7 @@ export class Users {
   @OneToOne(() => ModelHasRoles, modelHasRoles => modelHasRoles.user)
   public modelHasRoles: ModelHasRoles[];
 
-  @OneToMany(type => Hires, hire => hire.user) hire: Hires;
+  @OneToMany(type => Hires, hire => hire.sender) hire: Hires;
+
+  @OneToMany(type => Hires, hire => hire.receiver) _hire: Hires;
 }

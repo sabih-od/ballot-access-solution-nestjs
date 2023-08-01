@@ -6,6 +6,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { Role } from 'src/roles/entities/role.enum';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { AuthGuard } from '../guards/auth.guard';
+import { AcceptHireDto } from './dto/accept-hire.dto';
 
 @Controller('hires')
 export class HiresController {
@@ -33,6 +34,12 @@ export class HiresController {
   @Get('request')
   request(@Req() request: Request) {
     return this.hiresService.request(request);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('accept')
+  accept(@Req() request: Request, @Body() acceptHireDto: AcceptHireDto) {
+    return this.hiresService.accept(request, acceptHireDto);
   }
 
   @Get(':id')

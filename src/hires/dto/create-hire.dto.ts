@@ -11,5 +11,5 @@ export class CreateHireDto {
 
     @IsNotEmpty()
     @IsString()
-    user_id: string;
+    receiver_id: string;
 }

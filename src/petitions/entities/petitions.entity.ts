@@ -6,7 +6,7 @@ export class Petitions {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @PrimaryColumn({ type: 'varchar' })
+    @Column({ type: 'varchar' })
     uuid: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
@@ -27,5 +27,5 @@ export class Petitions {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 
-    // @OneToMany(type => Hires, hire => hire.petition) hire: Hires;
+    @OneToMany(type => Hires, hire => hire.petition) hire: Hires;
 }

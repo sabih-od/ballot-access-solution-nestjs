@@ -47,9 +47,10 @@ export class PetitionsController {
     return this.petitionsService.findAll(request);
   }
 
+  @UseGuards(AuthGuard)
   @Get(':uuid')
-  findOne(@Param('uuid') uuid: string) {
-    return this.petitionsService.findOneById(uuid);
+  findOne(@Param('uuid') uuid: string, @Req() request: Request) {
+    return this.petitionsService.findOneById(uuid, request);
   }
 
   @Get('/gatherers/:uuid')

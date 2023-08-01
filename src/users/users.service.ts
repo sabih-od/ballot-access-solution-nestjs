@@ -40,15 +40,15 @@ export class UsersService {
     try {
       return this.repository.find({
         select: {
-            id: true,
-            firstname: true,
-            lastname: true,
-            age: true,
-            gender: true,
-            email: true,
-            phone: true,
-            address: true,
-            company: true
+          id: true,
+          firstname: true,
+          lastname: true,
+          age: true,
+          gender: true,
+          email: true,
+          phone: true,
+          address: true,
+          company: true
         },
         relations: {
           modelHasRoles: {
@@ -57,7 +57,7 @@ export class UsersService {
         },
       });
     } catch (error) {
-      throw new Error('Error occurred while retrieving user by email');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -91,8 +91,7 @@ export class UsersService {
 
       // return await this.repository.findOne({ where: { email: email }, relations: ['modelHasRoles', 'modelHasRoles.roles'] });
     } catch (error) {
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error('Error occurred while retrieving user by email');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -119,8 +118,7 @@ export class UsersService {
         .where('users.id = :id', { id })
         .getOne();
     } catch (error) {
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error('Error occurred while retrieving user by email');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -142,8 +140,7 @@ export class UsersService {
         return await this.repository.save(user);
       }
     } catch (error) {
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error(error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -153,7 +150,7 @@ export class UsersService {
 
   async allPetitionGatherers() {
     try {
-      let petition_gatherer = Role.PETITIONER_GATHERER;
+      let petition_gatherer = Role.PETITION_GATHERER;
 
       let data = await this.rolesRepository
                       .createQueryBuilder('roles')
@@ -180,9 +177,7 @@ export class UsersService {
       return data?.userRoles ?? [];
       
     } catch (error) {
-      
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error(error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -215,11 +210,7 @@ export class UsersService {
       return data?.userRoles ?? [];
       
     } catch (error) {
-      
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error(error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-  }
-
-  
+  }  
 }

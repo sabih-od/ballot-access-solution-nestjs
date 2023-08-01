@@ -1,3 +1,4 @@
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 
@@ -33,6 +34,6 @@ export async function runCustomQuery(query: string, parameters?: any[]): Promise
     const result = await connection.query(query, parameters);
     return result;
   } catch (error) {
-    throw new Error(`Error executing the query: ${error.message}`);
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   }
 }

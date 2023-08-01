@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -40,7 +40,7 @@ export class RolesService {
       });
 
     } catch (error) {
-      throw new Error('Error occurred while retrieving user by email');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -60,8 +60,7 @@ export class RolesService {
     try {
       return await this.repository.findOne({ where: { name: name } });
     } catch (error) {
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error('Error occurred while retrieving user by email');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 }

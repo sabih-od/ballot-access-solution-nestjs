@@ -42,9 +42,9 @@ export class HiresService {
           // hires.petition_id = payload.petition_id;
           hires.petition_id = petition.id;
           hires.role_name = payload.role_name;
-          hires.user_id = payload.user_id;
+          hires.receiver_id = payload.receiver_id;
           hires.status = StatusEnum.NOT_ACCEPT;
-          hires.request_by = request.user['sub'];
+          hires.sender_id = request.user['sub'];
 
           return this.repository.save(hires);
         }
@@ -53,7 +53,7 @@ export class HiresService {
         throw new HttpException("You've already send request!", HttpStatus.UNPROCESSABLE_ENTITY);
       }
     } catch (error) {
-      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -73,17 +73,71 @@ export class HiresService {
     return `This action removes a #${id} hire`;
   }
 
-  async request(request) {
+  request(request) {
     return this.repository.find({
       select: {
         id: true,
-        request_by: true
+        sender_id: true,
+        sender: {
+          id: true,
+          firstname: true,
+          lastname: true,
+          age: true,
+          gender: true,
+          email: true,
+          phone: true,
+          address: true,
+          company: true,
+          modelHasRoles: {
+            model_id: true,
+            model_type: true,
+            role_id: true,
+            roles: {
+              name: true
+            }
+          }
+        },
+        petition: {
+          uuid: true,
+          name: true,
+          description: true,
+          attachment: true,
+        }
       },
       where: {
-        user_id: request?.user['sub'],
-        status: StatusEnum.NOT_ACCEPT
+        receiver_id: request?.user['sub'],
+        status: StatusEnum.NOT_ACCEPT,
+        sender: {
+          modelHasRoles: {
+            model_type: 'User'
+          }
+        }
+      },
+      relations: {
+        sender: {
+          modelHasRoles: {
+            roles: true
+          }
+        },
+        petition: true
       }
     });
+  }
+
+  async accept(request, payload) {
+    try {      
+      const validAccept = await this.validAccept(request, payload);
+      if(!validAccept) throw new HttpException('Invalid accept!', HttpStatus.UNPROCESSABLE_ENTITY);
+
+      const acceptRequest = await this.repository.findOneBy({
+        id: payload?.id,
+      });
+      acceptRequest.status = StatusEnum.ACCEPT;
+
+      return this.repository.save(acceptRequest)
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async validPetition(request, payload) {
@@ -91,7 +145,7 @@ export class HiresService {
   }
 
   async validRole(payload) {
-    const role = await Helper.role(payload?.user_id);
+    const role = await Helper.role(payload?.receiver_id);
     if(role == payload?.role_name) return true;
 
     return false;
@@ -102,8 +156,17 @@ export class HiresService {
       where: {
         petition_id: payload?.petition_id,
         role_name: payload?.role_name,
-        user_id: payload?.user_id,
-        request_by: request?.user['sub']
+        receiver_id: payload?.receiver_id,
+        sender_id: request?.user['sub']
+      }
+    });
+  }
+
+  async validAccept(request, payload) {
+    return await this.repository.findOne({
+      where: {
+        id: payload?.id,
+        receiver_id: request?.user['sub']
       }
     });
   }

@@ -43,14 +43,16 @@ export class PetitionsService {
 
       return petition;
     } catch (error) {
-      throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   async findAll(request: any) {
     try {
       const role = await Helper.role(request.user['sub']); // Using the helper service to get the role
-      if (role == 'admin') {
+
+      // fetch all petitions
+      if (role == Role.ADMIN) {
         return this.repository.find({
           select: {
             uuid: true,
@@ -61,11 +63,12 @@ export class PetitionsService {
         });
       }
 
+      // fetch petitioner petitions
       if (
-        role == 'site_manager' || 
-        role == 'petition_management_company' || 
-        role == 'ballot_or_initiative_committee' ||
-        role == 'political_candidate'
+        role == Role.SITE_MANAGER || 
+        role == Role.PETITION_MANAGEMENT_COMPANY || 
+        role == Role.BALLOT_OR_INITIATIVE_COMMITTEE ||
+        role == Role.POLITICAL_CANDIDATE
       ) {
         return this.repository.find({
           select: {
@@ -80,15 +83,38 @@ export class PetitionsService {
         });
       }
 
-      if (
-        role == 'petition_gatherer' ||
-        role == 'petition_validator'
-      ) {
-        
+      // fetch all assignees petitions (petition gatherer / validator)
+      else {
+        let petition = [];
+        const hire = await this.hireRepository.find({
+          select: {
+            petition: {
+              uuid: true,
+              name: true,
+              description: true,
+              attachment: true
+            }
+          },
+          where: {
+            status: StatusEnum.ACCEPT,
+            receiver_id: request.user['sub'],
+            role_name: role
+          },
+          relations: {
+            petition: true
+          }
+        });
+
+        if(hire?.length > 0) {
+          petition = hire.map(
+            data => ({ uuid: data?.petition?.uuid, name: data?.petition?.name, description: data?.petition?.description, attachment: data?.petition?.attachment })
+          )
+        }
+        return petition;
       }
 
     } catch (error) {
-      throw new Error('Error occurred while retrieving petitions');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -97,76 +123,109 @@ export class PetitionsService {
     return `This action returns a #${id} petition`;
   }
 
-  async findOneById(uuid: string) {
+  async findOneById(uuid: string, request: Request) {
     try {
       let result = {
         data: {},
         petitionGatherer: [],
         petitionValidator: [],
       };
+
+      const role = await Helper.role(request.user['sub']); // Using the helper service to get the role
       
       result.data = await this.repository.findOne({
         where: { uuid: uuid }
       });
 
-      if(result.data) {
-        result.petitionGatherer = await this.hireRepository.find({
-          select: {
-            user_id: true,
-            role_name: true,
-            user: {
-              id: true,
-              firstname: true,
-              lastname: true,
-              age: true,
-              gender: true,
-              email: true,
-              phone: true,
-              address: true,
-              company: true
+      if (
+        role == Role.ADMIN ||
+        role == Role.SITE_MANAGER || 
+        role == Role.PETITION_MANAGEMENT_COMPANY || 
+        role == Role.BALLOT_OR_INITIATIVE_COMMITTEE ||
+        role == Role.POLITICAL_CANDIDATE
+      ) {
+        if(result.data) {
+          result.petitionGatherer = await this.hireRepository.find({
+            select: {
+              receiver_id: true,
+              role_name: true,
+              sender: {
+                id: true,
+                firstname: true,
+                lastname: true,
+                age: true,
+                gender: true,
+                email: true,
+                phone: true,
+                address: true,
+                company: true
+              },
+              receiver: {
+                id: true,
+                firstname: true,
+                lastname: true,
+                age: true,
+                gender: true,
+                email: true,
+                phone: true,
+                address: true,
+                company: true
+              }
+            },
+            where: {
+              petition_id: result.data['id'],
+              role_name: Role.PETITION_GATHERER,
+              status: StatusEnum.ACCEPT
+            },
+            relations: {
+              sender: true,
+              receiver: true
             }
-          },
-          where: {
-            petition_id: result.data['id'],
-            role_name: Role.PETITIONER_GATHERER,
-            status: StatusEnum.ACCEPT
-          },
-          relations: {
-            user: true
-          }
-        });
+          });
 
-        result.petitionValidator = await this.hireRepository.find({
-          select: {
-            user_id: true,
-            role_name: true,
-            user: {
-              id: true,
-              firstname: true,
-              lastname: true,
-              age: true,
-              gender: true,
-              email: true,
-              phone: true,
-              address: true,
-              company: true
+          result.petitionValidator = await this.hireRepository.find({
+            select: {
+              receiver_id: true,
+              role_name: true,
+              sender: {
+                id: true,
+                firstname: true,
+                lastname: true,
+                age: true,
+                gender: true,
+                email: true,
+                phone: true,
+                address: true,
+                company: true
+              },
+              receiver: {
+                id: true,
+                firstname: true,
+                lastname: true,
+                age: true,
+                gender: true,
+                email: true,
+                phone: true,
+                address: true,
+                company: true
+              }
+            },
+            where: {
+              petition_id: result.data['id'],
+              role_name: Role.PETITION_VALIDATOR,
+              status: StatusEnum.ACCEPT
+            },
+            relations: {
+              sender: true,
+              receiver: true
             }
-          },
-          where: {
-            petition_id: result.data['id'],
-            role_name: Role.PETITION_VALIDATOR,
-            status: StatusEnum.ACCEPT
-          },
-          relations: {
-            user: true
-          }
-        });
+          });
+        }
       }
 
       return result;
     } catch (error) {
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error('Error occurred while retrieving user by email');
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -174,8 +233,7 @@ export class PetitionsService {
     try {
       return await this.repository.find({ where: { uuid: uuid } })
     } catch (error) {
-      // Handle the error appropriately (e.g., logging, throwing custom exceptions)
-      throw new Error(error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 

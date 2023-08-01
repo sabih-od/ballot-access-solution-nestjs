@@ -18,7 +18,7 @@ export class RolesSeeder {
                 Role.SITE_MANAGER,
                 Role.PETITION_MANAGEMENT_COMPANY,
                 Role.BALLOT_OR_INITIATIVE_COMMITTEE,
-                Role.PETITIONER_GATHERER,
+                Role.PETITION_GATHERER,
                 Role.PETITION_VALIDATOR,
                 Role.POLITICAL_CANDIDATE,
             ];
@@ -57,7 +57,7 @@ export class RolesSeeder {
                 }
             }
         } catch (error) {
-            throw new Error(error);
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
 
     }
