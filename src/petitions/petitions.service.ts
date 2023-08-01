@@ -59,7 +59,16 @@ export class PetitionsService {
             name: true,
             description: true,
             attachment: true,
+            user: {
+              firstname: true,
+              lastname: true,
+              email: true,
+              phone: true
+            }
           },
+          relations: {
+            user: true
+          }
         });
       }
 
@@ -76,9 +85,18 @@ export class PetitionsService {
             name: true,
             description: true,
             attachment: true,
+            user: {
+              firstname: true,
+              lastname: true,
+              email: true,
+              phone: true
+            }
           },
           where: {
             user_id: request.user['sub']
+          },
+          relations: {
+            user: true
           }
         });
       }
@@ -92,7 +110,13 @@ export class PetitionsService {
               uuid: true,
               name: true,
               description: true,
-              attachment: true
+              attachment: true,
+              user: {
+                firstname: true,
+                lastname: true,
+                email: true,
+                phone: true
+              }
             }
           },
           where: {
@@ -101,13 +125,22 @@ export class PetitionsService {
             role_name: role
           },
           relations: {
-            petition: true
+            petition: {
+              user: true
+            }
           }
         });
 
         if(hire?.length > 0) {
           petition = hire.map(
-            data => ({ uuid: data?.petition?.uuid, name: data?.petition?.name, description: data?.petition?.description, attachment: data?.petition?.attachment })
+            data => ({ 
+              uuid: data?.petition?.uuid, 
+              name: data?.petition?.name, 
+              description: data?.petition?.description, 
+              attachment: data?.petition?.attachment,
+              user: data?.petition?.user,
+              // role: data?.petition?.user?.role
+            })
           )
         }
         return petition;

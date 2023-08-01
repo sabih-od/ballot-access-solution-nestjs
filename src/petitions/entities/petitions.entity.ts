@@ -1,5 +1,6 @@
 import { Hires } from 'src/hires/entities/hires.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, PrimaryColumn, JoinColumn } from 'typeorm';
+import { Users } from 'src/users/entities/users.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, PrimaryColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Petitions {
@@ -28,4 +29,8 @@ export class Petitions {
     updated_at: Date;
 
     @OneToMany(type => Hires, hire => hire.petition) hire: Hires;
+
+    @ManyToOne(() => Users, user => user.petition)
+    @JoinColumn({ name: 'user_id' })
+    user: Users;
 }
