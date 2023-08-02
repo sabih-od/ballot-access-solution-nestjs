@@ -102,7 +102,7 @@ export class UsersService {
         .select([
           'users.id', 
           'users.firstname',
-          'users.lastname', 
+          'users.lastname',
           'users.age', 
           'users.gender', 
           'users.email',
@@ -118,10 +118,7 @@ export class UsersService {
         .where('users.id = :id', { id })
         .getOne();
 
-      // if (user) {
-      //   // Add the custom role value to the fetched user object
-      //   user['custom_role'] = user.role;
-      // }
+      if (user) user['role'] = await user._role;
 
       return user;
     } catch (error) {

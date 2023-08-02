@@ -52,8 +52,7 @@ export class Users {
   @OneToOne(() => Petitions, petition => petition.user)
   petition: Petitions;
 
-  // get role(): any {
-  //   // Your custom logic to determine the role value goes here
-  //   return "custom_role_value";
-  // }
+  get _role(): Promise<string> {
+    return Helper.role(this.id);
+  }
 }
