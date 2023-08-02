@@ -7,6 +7,7 @@ import { Role } from 'src/roles/entities/role.enum';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { AcceptHireDto } from './dto/accept-hire.dto';
+import { Request } from 'express';
 
 @Controller('hires')
 export class HiresController {
