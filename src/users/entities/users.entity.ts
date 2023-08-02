@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn, OnlyFieldsOfType, ManyToOne } from 'typeorm';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 import { Hires } from 'src/hires/entities/hires.entity';
+import { Petitions } from 'src/petitions/entities/petitions.entity';
+import { Helper } from 'src/helper';
 
 @Entity()
 export class Users {
@@ -46,4 +48,12 @@ export class Users {
   @OneToMany(type => Hires, hire => hire.sender) hire: Hires;
 
   @OneToMany(type => Hires, hire => hire.receiver) _hire: Hires;
+
+  @OneToOne(() => Petitions, petition => petition.user)
+  petition: Petitions;
+
+  // get role(): any {
+  //   // Your custom logic to determine the role value goes here
+  //   return "custom_role_value";
+  // }
 }

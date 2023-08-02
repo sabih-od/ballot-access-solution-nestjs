@@ -18,7 +18,13 @@ export class PetitionsController {
   constructor(private readonly petitionsService: PetitionsService) {}
 
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(
+    Role.ADMIN,
+    Role.BALLOT_OR_INITIATIVE_COMMITTEE, 
+    Role.PETITION_MANAGEMENT_COMPANY, 
+    Role.POLITICAL_CANDIDATE, 
+    Role.SITE_MANAGER
+  )
   @HttpCode(HttpStatus.OK)
   @Post()
   @UseInterceptors(

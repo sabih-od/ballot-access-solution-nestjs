@@ -1,6 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Permissions } from '../../permissions/entities/permissions.entity';
+import { Permission } from 'src/permissions/entities/permissions.enum';
 
 export class PermissionsSeeder {
     constructor(
@@ -10,14 +11,19 @@ export class PermissionsSeeder {
 
     async init() {
       let permissions = [
-        'create_user',
-        'update_user',
-        'view_user',
-        'delete_user',
-        'create_petition',
-        'update_petition',
-        'view_petition',
-        'delete_petition'
+        Permission.CREATE_USER,
+        Permission.UPDATE_USER,
+        Permission.VIEW_USER,
+        Permission.DELETE_USER,
+        Permission.CREATE_PETITION,
+        Permission.UPDATE_PETITION,
+        Permission.VIEW_PETITION,
+        Permission.DELETE_PETITION,
+        Permission.SEND_REQUEST,
+        Permission.ACCEPT_REQUEST,
+        Permission.UPLOAD_SIGNED_PETITIONS,
+        Permission.VIEW_SIGNED_PETITIONS,
+        Permission.VALIDATE_SIGNED_PETITIONS
       ];
 
       const permissionList = await this.repository.find({ where: { name: In ( permissions ) } });
