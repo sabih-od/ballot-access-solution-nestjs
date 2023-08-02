@@ -97,7 +97,7 @@ export class UsersService {
 
   async findOneById(id: string) {
     try {
-      return await this.repository
+      const user = await this.repository
         .createQueryBuilder('users')
         .select([
           'users.id', 
@@ -117,6 +117,13 @@ export class UsersService {
         .leftJoinAndSelect('modelHasRoles.roles', 'roles')
         .where('users.id = :id', { id })
         .getOne();
+
+      // if (user) {
+      //   // Add the custom role value to the fetched user object
+      //   user['custom_role'] = user.role;
+      // }
+
+      return user;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

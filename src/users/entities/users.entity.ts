@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn, OnlyFieldsOfType, ManyToOne } from 'typeorm';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 import { Hires } from 'src/hires/entities/hires.entity';
 import { Petitions } from 'src/petitions/entities/petitions.entity';
@@ -51,4 +51,9 @@ export class Users {
 
   @OneToOne(() => Petitions, petition => petition.user)
   petition: Petitions;
+
+  // get role(): any {
+  //   // Your custom logic to determine the role value goes here
+  //   return "custom_role_value";
+  // }
 }

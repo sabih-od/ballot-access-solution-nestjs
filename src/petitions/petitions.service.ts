@@ -167,9 +167,22 @@ export class PetitionsService {
       const role = await Helper.role(request.user['sub']); // Using the helper service to get the role
       
       result.data = await this.repository.findOne({
-        where: { uuid: uuid }
+        select: {
+          user: {
+            firstname: true,
+            lastname: true,
+            email: true,
+            phone: true,
+            address: true
+          }
+        },
+        where: { uuid: uuid },
+        relations: {
+          user: true
+        }
       });
 
+      // list of attached petition gatherer and validator
       if (
         role == Role.ADMIN ||
         role == Role.SITE_MANAGER || 
