@@ -12,6 +12,7 @@ import { RolesGuard } from 'src/guards/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { UploadPetitionDto } from './dto/upload-petition.dto';
 
 @Controller('petitions')
 export class PetitionsController {
@@ -22,7 +23,7 @@ export class PetitionsController {
     Role.ADMIN,
     Role.BALLOT_OR_INITIATIVE_COMMITTEE, 
     Role.PETITION_MANAGEMENT_COMPANY, 
-    Role.POLITICAL_CANDIDATE, 
+    Role.POLITICAL_CANDIDATE,
     Role.SITE_MANAGER
   )
   @HttpCode(HttpStatus.OK)
@@ -30,7 +31,7 @@ export class PetitionsController {
   @UseInterceptors(
     FileInterceptor('attachment', {
       storage: diskStorage({
-        destination: 'uploads',
+        destination: 'uploads/unsigned-petitions',
         filename: (req, file, callback) => {
           const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const fileExtension = extname(file.originalname);
@@ -72,5 +73,36 @@ export class PetitionsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.petitionsService.remove(+id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(
+    Role.ADMIN,
+    Role.BALLOT_OR_INITIATIVE_COMMITTEE, 
+    Role.PETITION_MANAGEMENT_COMPANY, 
+    Role.POLITICAL_CANDIDATE, 
+    Role.SITE_MANAGER
+  )
+  @HttpCode(HttpStatus.OK)
+  @Post('/upload')
+  @UseInterceptors(
+    FileInterceptor('attachment', {
+      storage: diskStorage({
+        destination: 'uploads/signed-petitions',
+        filename: (req, file, callback) => {
+          console.log('req', req)
+          const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const fileExtension = extname(file.originalname);
+          callback(null, uniqueName + fileExtension);
+        },
+      }),
+    }),
+  )
+  upload(
+    @Body() uploadPetitionDto: UploadPetitionDto, 
+    @Req() request: Request, 
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.petitionsService.upload(uploadPetitionDto, request, file);
   }
 }

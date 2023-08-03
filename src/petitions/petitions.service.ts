@@ -12,6 +12,8 @@ import { Request } from 'express';
 import { Helper } from './../helper';
 import { Hires, StatusEnum } from 'src/hires/entities/hires.entity';
 import { Role } from 'src/roles/entities/role.enum';
+import { UploadPetitionDto } from './dto/upload-petition.dto';
+import { SignedPetitions } from 'src/signed-petitions/entities/signed-petitions.entity';
 
 @Injectable()
 export class PetitionsService {
@@ -20,7 +22,10 @@ export class PetitionsService {
     private repository: Repository<Petitions>,
 
     @InjectRepository(Hires)
-    private hireRepository: Repository<Hires>
+    private hireRepository: Repository<Hires>,
+
+    @InjectRepository(SignedPetitions)
+    private signedPetitionRepository: Repository<SignedPetitions>
   ) {}
 
   async create(createPetitionDto: CreatePetitionDto, request: Request, file) {
@@ -289,5 +294,31 @@ export class PetitionsService {
 
   remove(id: number) {
     return `This action removes a #${id} petition`;
+  }
+
+  async upload(uploadPetitionDto: UploadPetitionDto, request: Request, file) {
+    try {
+      if (!file) throw new HttpException('Attachment is missing.!', HttpStatus.UNPROCESSABLE_ENTITY);
+
+      const petition = await this.repository.findOne({
+        where: {
+          uuid: uploadPetitionDto?.uuid
+        }
+      });
+      if(! petition) throw new HttpException('Invalid petition!', HttpStatus.UNPROCESSABLE_ENTITY);
+
+      const signedPetitions = new SignedPetitions();
+
+      signedPetitions.petition_id = petition?.id;
+      signedPetitions.created_by = request?.user['sub'];
+      signedPetitions.validate_no = 25;
+      signedPetitions.attachment = 'signed-petitions/' + file['filename'];
+
+      let signedPetition = await this.signedPetitionRepository.save(signedPetitions);
+
+      return signedPetition;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

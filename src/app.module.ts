@@ -31,6 +31,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ResetCodePasswordsModule } from './reset-code-passwords/reset-code-passwords.module';
 import { HiresModule } from './hires/hires.module';
+import { SignedPetitionsModule } from './signed-petitions/signed-petitions.module';
 
 @Module({
   imports: [
@@ -70,7 +71,8 @@ import { HiresModule } from './hires/hires.module';
     PermissionsModule,
     RoleHasPermissionsModule,
     ResetCodePasswordsModule,
-    HiresModule
+    HiresModule,
+    SignedPetitionsModule
   ],
   controllers: [AppController],
   providers: [
