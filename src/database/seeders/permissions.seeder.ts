@@ -5,9 +5,9 @@ import { Permission } from 'src/permissions/entities/permissions.enum';
 
 export class PermissionsSeeder {
     constructor(
-        @InjectRepository(Permissions)
-        private repository: Repository<Permissions>
-      ) {}
+      @InjectRepository(Permissions)
+      private repository: Repository<Permissions>
+    ) {}
 
     async init() {
       let permissions = [

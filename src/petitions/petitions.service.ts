@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, HttpException, HttpStatus, Execution
 import { CreatePetitionDto } from './dto/create-petition.dto';
 import { UpdatePetitionDto } from './dto/update-petition.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
@@ -164,14 +164,18 @@ export class PetitionsService {
   async findOneById(uuid: string, request: Request) {
     try {
       let result = {
-        data: {},
+        data: {
+          id: 0
+        },
         petitionGatherer: [],
         petitionValidator: [],
+        signedPetition: []
       };
 
-      const role = await Helper.role(request.user['sub']); // Using the helper service to get the role
-      
-      result.data = await this.repository.findOne({
+      // Using the helper service to get the role
+      const role = await Helper.role(request.user['sub']); 
+ 
+      await this.repository.findOne({
         select: {
           user: {
             firstname: true,
@@ -185,6 +189,42 @@ export class PetitionsService {
         relations: {
           user: true
         }
+      }).then((resolvedValue: Petitions) => {
+        result.data = resolvedValue;
+      }).catch((error) => {
+        // Handle errors here
+      });
+
+      this.signedPetitionRepository.find({
+        select: {
+          creator: {
+            firstname: true,
+            lastname: true,
+            email: true,
+            phone: true,
+            address: true,
+            company: true
+          },
+          updator: {
+            firstname: true,
+            lastname: true,
+            email: true,
+            phone: true,
+            address: true,
+            company: true
+          }
+        },
+        where: {
+          petition_id: result.data.id
+        },
+        relations: {
+          creator: true,
+          updator: true
+        }
+      }).then((resolvedValue: SignedPetitions[]) => {
+        result.signedPetition = resolvedValue;
+      }).catch((error) => {
+        // Handle errors here
       });
 
       // list of attached petition gatherer and validator
@@ -307,16 +347,63 @@ export class PetitionsService {
       });
       if(! petition) throw new HttpException('Invalid petition!', HttpStatus.UNPROCESSABLE_ENTITY);
 
+      // check limit
+      const findSignedPetition = await this.signedPetitionRepository.find({
+        where: {
+          petition_id: petition?.id
+        }
+      });
+
+      if(findSignedPetition?.length >= petition.limit) throw new HttpException('Limit exceed!', HttpStatus.UNPROCESSABLE_ENTITY);
+
       const signedPetitions = new SignedPetitions();
 
       signedPetitions.petition_id = petition?.id;
       signedPetitions.created_by = request?.user['sub'];
-      signedPetitions.validate_no = 25;
       signedPetitions.attachment = 'signed-petitions/' + file['filename'];
 
-      let signedPetition = await this.signedPetitionRepository.save(signedPetitions);
+      const signedPetition = await this.signedPetitionRepository.save(signedPetitions);
 
       return signedPetition;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findSignedPetition(id: number) {
+    try {
+      let result = {}
+
+      await this.signedPetitionRepository.findOne({
+        select: {
+          creator: {
+            firstname: true,
+            lastname: true,
+            email: true,
+            phone: true
+          },
+          updator: {
+            firstname: true,
+            lastname: true,
+            email: true,
+            phone: true
+          }
+        },
+        where: {
+          id: id
+        },
+        relations: {
+          petition: true,
+          creator: true,
+          updator: true
+        }
+      }).then((resolvedValue: SignedPetitions) => {
+        result = resolvedValue
+      }).catch((error) => {
+        throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      });
+
+      return result;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

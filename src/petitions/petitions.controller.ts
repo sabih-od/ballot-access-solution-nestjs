@@ -60,6 +60,12 @@ export class PetitionsController {
     return this.petitionsService.findOneById(uuid, request);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('/:uuid/signed-petition/:id')
+  findSignedPetition(@Param('id') id: number) {
+    return this.petitionsService.findSignedPetition(id);
+  }
+
   @Get('/gatherers/:uuid')
   gatherers(@Param('uuid') uuid: string) {
     return this.petitionsService.gatherers(uuid);

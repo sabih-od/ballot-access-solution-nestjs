@@ -3,6 +3,7 @@ import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.enti
 import { Hires } from 'src/hires/entities/hires.entity';
 import { Petitions } from 'src/petitions/entities/petitions.entity';
 import { Helper } from 'src/helper';
+import { SignedPetitions } from 'src/signed-petitions/entities/signed-petitions.entity';
 
 @Entity()
 export class Users {
@@ -51,6 +52,10 @@ export class Users {
 
   @OneToOne(() => Petitions, petition => petition.user)
   petition: Petitions;
+
+  @OneToMany(type => SignedPetitions, signedPetition => signedPetition.creator) creator: SignedPetitions;
+
+  @OneToMany(type => SignedPetitions, signedPetition => signedPetition.updator) updator: SignedPetitions;
 
   get _role(): Promise<string> {
     return Helper.role(this.id);
