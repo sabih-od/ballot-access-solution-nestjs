@@ -2,6 +2,8 @@
 /dist
 /node_modules
 /uploads
+/data-source.ts
+/src/main.ts
 
 # Logs
 logs
