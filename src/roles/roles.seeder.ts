@@ -44,8 +44,8 @@ export class RolesSeeder {
                 for (const key in roles) {
                     if (Object.prototype.hasOwnProperty.call(roles, key)) {
                         const element = roles[key];
-                        let findRole = await this.repository.find({ where: { name: element } })
-                        if( findRole?.length == 0 ) {
+                        let findRole = await this.repository.findOne({ where: { name: element } })
+                        if( !findRole ) {
                             await this.repository
                                 .createQueryBuilder('roles')
                                 .insert()
