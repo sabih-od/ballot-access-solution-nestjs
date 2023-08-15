@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException, HttpException, HttpStatus, ExecutionContext, Inject, Req } from '@nestjs/common';
 import { CreatePetitionDto } from './dto/create-petition.dto';
 import { UpdatePetitionDto } from './dto/update-petition.dto';
+import { ValidateUploadPetitionDto } from './dto/validate-upload-petition.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Any, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -336,13 +337,13 @@ export class PetitionsService {
     return `This action removes a #${id} petition`;
   }
 
-  async upload(uploadPetitionDto: UploadPetitionDto, request: Request, file) {
+  async upload(payload: UploadPetitionDto, request: Request, file) {
     try {
       if (!file) throw new HttpException('Attachment is missing.!', HttpStatus.UNPROCESSABLE_ENTITY);
 
       const petition = await this.repository.findOne({
         where: {
-          uuid: uploadPetitionDto?.uuid
+          uuid: payload?.uuid
         }
       });
       if(! petition) throw new HttpException('Invalid petition!', HttpStatus.UNPROCESSABLE_ENTITY);
@@ -402,6 +403,38 @@ export class PetitionsService {
       }).catch((error) => {
         throw new HttpException(error, HttpStatus.BAD_REQUEST);
       });
+
+      return result;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async validatePetition(id: number, payload: ValidateUploadPetitionDto, request: Request) {
+    try {
+      // signed petition exist
+      const signedPetition = await this.signedPetitionRepository.findOne({
+        where: {
+          id: id
+        }
+      });
+      if(! signedPetition) throw new HttpException('Invalid upload!', HttpStatus.UNPROCESSABLE_ENTITY);
+
+      // petition exist
+      const petition = await this.repository.findOne({
+        where: {
+          id: signedPetition?.id
+        }
+      });
+      if(! petition) throw new HttpException('Invalid petition!', HttpStatus.UNPROCESSABLE_ENTITY);
+
+      if(payload.validate_signature > petition.limit) throw new HttpException('Limit exceed!', HttpStatus.UNPROCESSABLE_ENTITY);
+
+      signedPetition.updated_by = request?.user['sub'];
+      signedPetition.validate_signature = payload.validate_signature;
+
+      // update validate no.
+      let result = this.signedPetitionRepository.save(signedPetition);
 
       return result;
     } catch (error) {

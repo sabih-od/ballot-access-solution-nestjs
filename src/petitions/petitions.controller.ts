@@ -13,6 +13,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UploadPetitionDto } from './dto/upload-petition.dto';
+import { ValidateUploadPetitionDto } from './dto/validate-upload-petition.dto';
 
 @Controller('petitions')
 export class PetitionsController {
@@ -96,7 +97,6 @@ export class PetitionsController {
       storage: diskStorage({
         destination: 'uploads/signed-petitions',
         filename: (req, file, callback) => {
-          console.log('req', req)
           const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const fileExtension = extname(file.originalname);
           callback(null, uniqueName + fileExtension);
@@ -110,5 +110,15 @@ export class PetitionsController {
     @UploadedFile() file: Express.Multer.File
   ) {
     return this.petitionsService.upload(uploadPetitionDto, request, file);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(
+    Role.ADMIN,
+    Role.PETITION_VALIDATOR
+  )
+  @Patch('/validate/:id')
+  validate(@Param('id') id: string, @Body() validateUploadPetitionDto: ValidateUploadPetitionDto, @Req() request: Request) {
+    return this.petitionsService.validatePetition(+id, validateUploadPetitionDto, request);
   }
 }
