@@ -13,4 +13,12 @@ export class Helper {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  static async getIdFromIndex(array, value):Promise <any> {
+    try {
+      return array.indexOf(value) + 1
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

@@ -13,7 +13,7 @@ import { Users } from 'src/users/entities/users.entity';
 import { Roles } from 'src/roles/entities/roles.entity';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 import { Permissions } from 'src/permissions/entities/permissions.entity';
-import { RoleHasPermission } from 'src/role-has-permissions/entities/role-has-permission.entity';
+import { RoleHasPermissions } from 'src/role-has-permissions/entities/role-has-permissions.entity';
 import { ResetCodePasswords } from 'src/reset-code-passwords/entities/reset-code-passwords.entity';
 import { MailService } from 'src/services/mail.service';
 
@@ -31,7 +31,7 @@ import { MailService } from 'src/services/mail.service';
       Roles, 
       ModelHasRoles, 
       Permissions, 
-      RoleHasPermission,
+      RoleHasPermissions,
       ResetCodePasswords
     ])
   ],

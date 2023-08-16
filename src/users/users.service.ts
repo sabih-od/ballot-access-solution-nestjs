@@ -86,6 +86,7 @@ export class UsersService {
           modelType: 'User',
         })
         .leftJoinAndSelect('modelHasRoles.roles', 'roles')
+        .leftJoinAndSelect('roles.permissions', 'permissions')
         .where('users.email = :email', { email })
         .getOne();
 

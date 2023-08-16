@@ -15,7 +15,7 @@ import { Users } from './users/entities/users.entity';
 import { ModelHasRoles } from './model-has-roles/entities/model-has-roles.entity';
 import { Petitions } from './petitions/entities/petitions.entity';
 import { Permissions } from './permissions/entities/permissions.entity';
-import { RoleHasPermission } from './role-has-permissions/entities/role-has-permission.entity';
+import { RoleHasPermissions } from './role-has-permissions/entities/role-has-permissions.entity';
 import { ResetCodePasswords } from './reset-code-passwords/entities/reset-code-passwords.entity';
 import { Hires } from './hires/entities/hires.entity';
 
@@ -42,7 +42,7 @@ import { SignedPetitionsModule } from './signed-petitions/signed-petitions.modul
       Roles, 
       ModelHasRoles, 
       Permissions, 
-      RoleHasPermission, 
+      RoleHasPermissions, 
       Petitions,
       ResetCodePasswords,
       Hires
