@@ -60,4 +60,8 @@ export class Users {
   get _role(): Promise<string> {
     return Helper.role(this.id);
   }
+
+  get _permissions(): Promise<string> {
+    return Helper.permissions(this.id);
+  }
 }

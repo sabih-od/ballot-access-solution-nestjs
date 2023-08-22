@@ -10,6 +10,7 @@ import { Roles } from 'src/roles/entities/roles.entity';
 import { ModelHasRoles } from 'src/model-has-roles/entities/model-has-roles.entity';
 import { ResetCodePasswords } from 'src/reset-code-passwords/entities/reset-code-passwords.entity';
 import { MailService } from '../services/mail.service';
+import { Helper } from 'src/helper';
 
 @Injectable()
 export class AuthService {
@@ -46,8 +47,9 @@ export class AuthService {
       
       const payload = { sub: user.id, email: user.email };
       const access_token = await this.jwtService.signAsync(payload);
+      const permissions = await Helper.permissions(user.id)
       
-      return { access_token, user };
+      return { access_token, user, permissions };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -96,8 +98,9 @@ export class AuthService {
 
       const _payload = { sub: user.id, email: user.email };
       const access_token = await this.jwtService.signAsync(_payload);
+      const permissions = await Helper.permissions(user.id)
       
-      return { access_token, user };
+      return { access_token, user, permissions };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

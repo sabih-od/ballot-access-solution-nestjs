@@ -88,7 +88,8 @@ export class PetitionsController {
     Role.BALLOT_OR_INITIATIVE_COMMITTEE, 
     Role.PETITION_MANAGEMENT_COMPANY, 
     Role.POLITICAL_CANDIDATE, 
-    Role.SITE_MANAGER
+    Role.SITE_MANAGER,
+    Role.PETITION_GATHERER
   )
   @HttpCode(HttpStatus.OK)
   @Post('/upload')

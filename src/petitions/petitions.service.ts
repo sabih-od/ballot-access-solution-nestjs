@@ -196,7 +196,7 @@ export class PetitionsService {
         // Handle errors here
       });
 
-      this.signedPetitionRepository.find({
+      await this.signedPetitionRepository.find({
         select: {
           creator: {
             firstname: true,
@@ -423,7 +423,7 @@ export class PetitionsService {
       // petition exist
       const petition = await this.repository.findOne({
         where: {
-          id: signedPetition?.id
+          id: signedPetition?.petition_id
         }
       });
       if(! petition) throw new HttpException('Invalid petition!', HttpStatus.UNPROCESSABLE_ENTITY);
