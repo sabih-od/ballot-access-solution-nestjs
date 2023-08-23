@@ -116,6 +116,9 @@ export class AuthService {
                     'users.age', 
                     'users.gender', 
                     'users.email',
+                    'users.phone',
+                    'users.company',
+                    'users.address',
                   ])
                   .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
                     modelType: 'User',
@@ -125,6 +128,28 @@ export class AuthService {
                   .getOne();
 
     return await user;
+  }
+
+  async updateProfile(id: string, payload) {
+    try {
+
+      const user = await this.repository.findOneBy({ id });
+
+      if(user != null) {
+        user.firstname = payload.firstname;
+        user.lastname = payload.lastname;
+        user.phone = payload.phone;
+        user.company = payload.company;
+        user.address = payload.address;
+        user.age = payload.age;
+        user.gender = payload.gender;
+        user.updated_at = new Date();
+
+        return await this.repository.save(user);
+      }
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async forgotPassword(email) {

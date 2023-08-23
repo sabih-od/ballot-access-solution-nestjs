@@ -4,6 +4,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Request,
   UseGuards 
@@ -14,10 +16,12 @@ import { SignInDto } from './dto/signin.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { UsersService } from './../users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private readonly usersService: UsersService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -47,5 +51,11 @@ export class AuthController {
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('profile')
+  update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(req.user?.sub, updateUserDto);
   }
 }
