@@ -129,9 +129,8 @@ export class UsersService {
 
   async update(id: string, payload) {
     try {
-
       const user = await this.repository.findOneBy({ id });
-console.log('user', user)
+
       if(user != null) {
         user.firstname = payload.firstname;
         user.lastname = payload.lastname;
