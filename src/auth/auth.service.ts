@@ -119,6 +119,7 @@ export class AuthService {
                     'users.phone',
                     'users.company',
                     'users.address',
+                    'users.attachment'
                   ])
                   .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
                     modelType: 'User',

@@ -32,8 +32,12 @@ export class HiresService {
       // check request not exist!
       let petition_id = petition?.id;
       const requestExist = await this.requestExist(request, payload, petition_id);
+      if(requestExist) throw new HttpException("Request exist!", HttpStatus.UNPROCESSABLE_ENTITY);
 
-      if(!requestExist) {
+      const hireExist = await this.hireExist(request, payload, petition_id);
+      if(hireExist) throw new HttpException("Already exist!", HttpStatus.UNPROCESSABLE_ENTITY);
+
+      // if(!requestExist) {
         const hires = new Hires();
 
         hires.petition_id = petition_id;
@@ -43,9 +47,8 @@ export class HiresService {
         hires.sender_id = request.user['sub'];
 
         return this.repository.save(hires);
-      }
+      // }
       
-      throw new HttpException("Request already sent!", HttpStatus.UNPROCESSABLE_ENTITY);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -164,6 +167,16 @@ export class HiresService {
         role_name: payload?.role_name,
         receiver_id: payload?.receiver_id,
         // sender_id: request?.user['sub']
+      }
+    });
+  }
+
+  async hireExist(request, payload, petition_id) {
+    return await this.repository.findOne({
+      where: {
+        petition_id: petition_id,
+        role_name: payload?.role_name,
+        status: StatusEnum.ACCEPT
       }
     });
   }

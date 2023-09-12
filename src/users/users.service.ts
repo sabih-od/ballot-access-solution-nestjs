@@ -80,7 +80,8 @@ export class UsersService {
           'users.password',
           'users.phone',
           'users.address',
-          'users.company'
+          'users.company',
+          'users.attachment'
         ])
         .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
           modelType: 'User',
@@ -111,6 +112,7 @@ export class UsersService {
           'users.phone',
           'users.address',
           'users.company',
+          'users.attachment'
         ])
         .leftJoinAndSelect('users.modelHasRoles', 'modelHasRoles', 'modelHasRoles.model_type = :modelType', {
           modelType: 'User',
@@ -127,11 +129,10 @@ export class UsersService {
     }
   }
 
-  async update(id: string, payload) {
+  async update(id: string, payload: UpdateUserDto, file: Express.Multer.File = null) {
     try {
-
       const user = await this.repository.findOneBy({ id });
-console.log('user', user)
+
       if(user != null) {
         user.firstname = payload.firstname;
         user.lastname = payload.lastname;
@@ -141,6 +142,8 @@ console.log('user', user)
         user.age = payload.age;
         user.gender = payload.gender;
         user.updated_at = new Date();
+
+        if( file ) user.attachment = 'profile-pictures/' + file['filename'];
 
         return await this.repository.save(user);
       }
