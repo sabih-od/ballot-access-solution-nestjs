@@ -8,7 +8,9 @@ import {
   Patch,
   Post,
   Request,
-  UseGuards 
+  UploadedFile,
+  UseGuards, 
+  UseInterceptors
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { AuthService } from './auth.service';
@@ -18,6 +20,9 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { UsersService } from './../users/users.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('auth')
 export class AuthController {
@@ -54,8 +59,24 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @UseInterceptors(
+    FileInterceptor('attachment', {
+      storage: diskStorage({
+        destination: 'uploads/profile-pictures',
+        filename: (req, file, callback) => {
+          const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const fileExtension = extname(file.originalname);
+          callback(null, uniqueName + fileExtension);
+        },
+      }),
+    }),
+  )
   @Patch('profile')
-  update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.user?.sub, updateUserDto);
+  update(
+    @Request() req, 
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.usersService.update(req.user?.sub, updateUserDto, file);
   }
 }

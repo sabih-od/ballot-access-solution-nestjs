@@ -37,6 +37,9 @@ export class Users {
   @Column({ type: 'varchar', length: 255, nullable: true })
   company: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  attachment: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
